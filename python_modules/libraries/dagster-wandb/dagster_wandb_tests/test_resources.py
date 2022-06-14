@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pytest
 import wandb.sdk as wandb_sdk
 from dagster_wandb import wandb_resource
+from dagster_wandb.resources import WANDB_CLOUD_HOST
 
 from dagster import DagsterResourceFunctionError, build_op_context, op
 
@@ -11,6 +12,19 @@ from dagster import DagsterResourceFunctionError, build_op_context, op
 def test_wandb_resource_invalid_key():
     with pytest.raises(DagsterResourceFunctionError):
         build_op_context(resources={"wandb": wandb_resource.configured({"api_key": "dummy"})})
+
+
+@patch("wandb.login")
+def test_wandb_resource_local_instance(login):
+    test_ctx = build_op_context(
+        resources={
+            "wandb": wandb_resource.configured(
+                {"api_key": "mock_key", "host": "https://qa.platform.ai"}
+            )
+        }
+    )
+    login.assert_called_with(key="mock_key", host="https://qa.platform.ai")
+    assert build_op_context(resources={"wandb": wandb_resource.configured({"api_key": "dummy"})})
 
 
 @patch("wandb.login")
@@ -59,5 +73,5 @@ def test_resource_methods(artifact, sweep, agent, save, log, finish, init, confi
     test_ctx = build_op_context(
         resources={"wandb": wandb_resource.configured({"api_key": "mock_key"})}
     )
-    login.assert_called_with(key="mock_key")
+    login.assert_called_with(key="mock_key", host=WANDB_CLOUD_HOST)
     assert test_dummy_op(test_ctx)
