@@ -1,9 +1,7 @@
-import os
 from unittest.mock import patch
 
 import pytest
-import wandb.sdk as wandb_sdk
-from dagster_wandb import wandb_resource
+from dagster_wandb import wandb_api_resource, wandb_resource
 from dagster_wandb.resources import WANDB_CLOUD_HOST
 
 from dagster import DagsterResourceFunctionError, build_op_context, op
@@ -23,7 +21,7 @@ def test_wandb_resource_local_instance(login):
             )
         }
     )
-    login.assert_called_with(key="mock_key", host="https://qa.platform.ai", anonymous='never')
+    login.assert_called_with(key="mock_key", host="https://qa.platform.ai", anonymous="never")
     assert build_op_context(resources={"wandb": wandb_resource.configured({"api_key": "dummy"})})
 
 
@@ -73,5 +71,30 @@ def test_resource_methods(artifact, sweep, agent, save, log, finish, init, confi
     test_ctx = build_op_context(
         resources={"wandb": wandb_resource.configured({"api_key": "mock_key"})}
     )
-    login.assert_called_with(key="mock_key", host=WANDB_CLOUD_HOST, anonymous='never')
+    login.assert_called_with(key="mock_key", host=WANDB_CLOUD_HOST, anonymous="never")
+    assert test_dummy_op(test_ctx)
+
+
+@patch("wandb.Settings")
+@patch("wandb.sdk.internal.internal_api.Api.create_launch_agent")
+def test_resource_methods(launch_agent, settings):
+    @op(required_resource_keys={"wandb_api"})
+    def test_dummy_op(context):
+        assert context.resources.wandb_api
+
+        context.resources.wandb_api.create_launch_agent(
+            entity="test_entity", project="test_project", queues=None, gorilla_agent_support=None
+        )
+        launch_agent.assert_called_with(
+            entity="test_entity", project="test_project", queues=None, gorilla_agent_support=None
+        )
+
+        return True
+
+    test_ctx = build_op_context(
+        resources={"wandb_api": wandb_api_resource.configured({"api_key": "mock_key"})}
+    )
+    settings.assert_called_with(
+        api_key="mock_key", base_url=WANDB_CLOUD_HOST, anonymous="never", launch=True
+    )
     assert test_dummy_op(test_ctx)
