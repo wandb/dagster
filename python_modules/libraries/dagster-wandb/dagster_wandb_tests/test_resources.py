@@ -23,7 +23,7 @@ def test_wandb_resource_local_instance(login):
             )
         }
     )
-    login.assert_called_with(key="mock_key", host="https://qa.platform.ai")
+    login.assert_called_with(key="mock_key", host="https://qa.platform.ai", anonymous='never')
     assert build_op_context(resources={"wandb": wandb_resource.configured({"api_key": "dummy"})})
 
 
@@ -73,5 +73,5 @@ def test_resource_methods(artifact, sweep, agent, save, log, finish, init, confi
     test_ctx = build_op_context(
         resources={"wandb": wandb_resource.configured({"api_key": "mock_key"})}
     )
-    login.assert_called_with(key="mock_key", host=WANDB_CLOUD_HOST)
+    login.assert_called_with(key="mock_key", host=WANDB_CLOUD_HOST, anonymous='never')
     assert test_dummy_op(test_ctx)

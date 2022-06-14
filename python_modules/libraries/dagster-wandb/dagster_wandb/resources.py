@@ -48,5 +48,6 @@ def wandb_resource(context: OpExecutionContext) -> wandb:
     wandb.login(
         key=context.resource_config["api_key"],
         host=context.resource_config["host"],
+        anonymous='never',
     )
     return wandb
