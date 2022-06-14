@@ -34,7 +34,7 @@ def wandb_resource(context: OpExecutionContext) -> wandb:
             @op(required_resource_keys={'wandb'})
             def do_some_nlp(context):
                 wandb = context.resources.wandb
-                headlines = ['Square(SQ) Surpasses Q4...', ...]
+                headlines = ["A", "B", "C"]
                 text_table = wandb.Table(columns=["Headline", "Positive", "Negative", "Neutral"])
                 for headline in headlines:
                     pos_score, neg_score, neutral_score = model(headline)
