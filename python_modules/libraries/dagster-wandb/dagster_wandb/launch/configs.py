@@ -1,5 +1,6 @@
-from dagster import Array, Bool, Field, IntSource, String, StringSource, Noneable
-
+from dagster import Bool, Field, String, Noneable
+from dagster_wandb.launch.util import utils
+import json
 
 def wandb_init_config():
     api_key = Field(
@@ -10,8 +11,6 @@ def wandb_init_config():
 
 
 def wandb_launch_shared_config():
-
-    # api_ = wandb_init_config()
     uri = Field(
         config=str,
         is_required=True,
@@ -35,7 +34,6 @@ def wandb_launch_shared_config():
     return {
         "uri": uri,
         "entry_point": entry_point,
-        # "api": api_["api_key"],
         "entity": entity,
         "project": project
     }
@@ -97,7 +95,7 @@ def wandb_launch_config():
         }
     }
 
-
+#:TODO
 def wandb_launch_agent_queue_config():
     entity = Field(
         String,
@@ -127,29 +125,32 @@ def wandb_launch_agent_queue_config():
 
 
 def wandb_launch_agent_config():
-    api_ = wandb_init_config()
-    queue_config = wandb_launch_agent_queue_config()
-
     entity = Field(
         String,
         description="The target entity for the launched run. Defaults to current logged-in user"
     )
-    ''' queues "The queue names to poll"
-    '''
+    project = Field(
+        String,
+        is_required=True,
+        description="The target project for the launched run"
+    )
+    queues = Field(
+        [String],
+        default_value=["default"],
+        description="The queue names to poll"
+    )
     max_jobs = Field(
         int,
         description="The maximum number of launch jobs this agent can run in parallel. Defaults to 1.",
     )
     return {
-        "launch_agent_config": {
-            "api":api_["api_key"],
             "entity": entity,
-            "queues": queue_config["name"],
+            "queues": queues,
+            "project" : project,
             "max_jobs": max_jobs
-        }
     }
 
-
+# :TODO
 def wandb_compute_kubernetes_config():
     sc = wandb_launch_shared_config()
     config_file = Field(
@@ -199,7 +200,6 @@ def wandb_compute_kubernetes_config():
 
     return {
         "uri": sc["uri"],
-#         "api": sc["api_key"],
         "entity": sc["entity"],
         "project": sc["project"],
         "resource":resource,
@@ -212,7 +212,9 @@ def wandb_compute_kubernetes_config():
 
 
 def wandb_compute_gcp_config():
+    # uri, entity, project
     sc = wandb_launch_shared_config()
+
     resource = Field(
         String,
         default_value="gcp_vertex",
@@ -231,14 +233,27 @@ def wandb_compute_gcp_config():
     )
     return {
         "uri": sc["uri"],
-#        "api": sc["api_key"],
         "entity": sc["entity"],
         "project": sc["project"],
-        "resource":resource,
-        "resource_args" : {
-            "gcp_vertex": {
-                "staging_bucket": bucket,
-                "artifact_repo": repo,
-            }
-        }
+        "resource": resource,
+        "staging_bucket": bucket,
+        "artifact_repo": repo,
     }
+
+
+def wandb_compute_aws_config():
+    path = "launch_sagemaker_config.json"
+    f_path = utils.config_path(path, "../../../")
+    kwargs = json.loads(utils.config_open(f_path, "r").read())
+
+    # uri, entity, project
+    sc = wandb_launch_shared_config()
+
+    kwargs["uri"] = sc["uri"]
+    kwargs["entity"] = sc["entity"]
+    kwargs["project"] = sc["project"]
+    return kwargs
+
+
+
+

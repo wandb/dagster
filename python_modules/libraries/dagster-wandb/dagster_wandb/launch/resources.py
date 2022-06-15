@@ -1,6 +1,5 @@
 from dagster import Field, OpExecutionContext, StringSource, resource
 import wandb.sdk.launch
-import wandb.sdk.launch.agent as launch_agent
 
 import wandb.sdk.internal.internal_api as wandb_internal
 
@@ -35,13 +34,6 @@ def wandb_local_resource(context):
 )
 def wandb_agent_queue(context):
     return wandb_internal.create_run_queue(**context.resource_config)
-
-
-@resource(
-    config_schema=wandb_launch_agent_config(), description="Launch Agent resource"
-)
-def wandb_agent(context):
-    return launch_agent.LaunchAgent(**context.resource_config)
 
 
 @resource(
