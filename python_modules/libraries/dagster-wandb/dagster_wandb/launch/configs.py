@@ -18,7 +18,7 @@ def wandb_launch_shared_config():
     )
     entry_point = Field(
         String,
-        description="Entry point of the run"
+        description="Entry point of the run. default: main"
     )
 
     entity = Field(
@@ -40,6 +40,8 @@ def wandb_launch_shared_config():
 
 
 def wandb_launch_config():
+    shared_conf = wandb_launch_shared_config
+
     uri = Field(
         config=str,
         is_required=True,

@@ -3,14 +3,13 @@ import pytest
 from dagster_wandb.launch.ops import (
     wandb_launch_single_run_op,
     wandb_launch_gcp_op,
-    wandb_launch_aws_op,
+    # wandb_launch_aws_op,
     wandb_launch_agent_op
 )
 from dagster_wandb.resources import wandb_api_resource
 from dagster import job
 from dagster_wandb.launch.util import utils
 import json
-
 
 
 def test_wandb_launch_local_op():
@@ -20,7 +19,7 @@ def test_wandb_launch_local_op():
     result = launch_single_run.execute_in_process(
             run_config={"ops": {"single_run_op": {"config": {"uri": "https://github.com/stephchen/sc-pytorch-mnist"
                                                           , "entry_point": "python train.py"
-                                                          , "entity": "mock_server_entity"
+                                                          , "entity": "wandb-data-science"
                                                           , "project" : "launch_testing"
                                                           }}}
                         ,'resources': {'wandbapi': {'config': {'api_key': 'test'}}}
@@ -37,7 +36,7 @@ def test_wandb_launch_agent_op():
 
     result = launch_local_agent.execute_in_process(
         run_config={ "ops": {"launch_local_agent_op" : {"config":{
-             "entity": "mock_server_entity"
+             "entity": "wandb-data-science"
             , "project" : "launch_testing"
             , "max_jobs" : 2
         }}}

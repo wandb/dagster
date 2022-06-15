@@ -30,9 +30,10 @@ def wandb_launch_single_run_op(context):
     Expects a single run resource to be provisioned and initiate a run.
     Args:
         context:
-
     Returns:
         submitted_run output
+    example:
+    wandb launch <uri> - Launches a single run.
 
     """
     # print("In wandb_launch_single_run_op")
@@ -44,6 +45,35 @@ def wandb_launch_single_run_op(context):
                                     , entity=entity, project=project)
     # print(wandb_output)
     return wandb_output
+
+
+@op(
+    **_DEFAULT_OP_PROPS,
+    config_schema=wandb_launch_shared_config(),
+)
+def wandb_launch_op(context):
+    """
+    wandb Launch Local - single run
+    This op encapsulates a wandb launch
+    Expects a single run resource to be provisioned and initiate a run.
+    Args:
+        context:
+    Returns:
+        submitted_run output
+    example:
+    wandb launch <uri> - Launches a single run.
+
+    """
+    # print("In wandb_launch_single_run_op")
+    context.log.info("executing single_run_op %s" % (context.op_config.get("uri")))
+
+    (uri, entry_point, entity, project) = [context.op_config.get(k) for k in ("uri", "entry_point", "entity", "project")]
+    wandb_output = wandb_launch.run(api=context.resources.wandbapi
+                                    , uri=uri, entry_point=entry_point
+                                    , entity=entity, project=project)
+    # print(wandb_output)
+    return wandb_output
+
 
 
 @op(
@@ -131,7 +161,7 @@ def wandb_launch_gcp_op(context):
 
 @op(
     **_DEFAULT_OP_PROPS,
-    config_schema=wandb_compute_aws_config()
+    # config_schema=wandb_compute_aws_config()
 )
 def wandb_launch_aws_op(context):
     """
