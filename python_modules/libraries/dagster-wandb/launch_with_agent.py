@@ -1,7 +1,6 @@
 import os
 from dagster import job
 from dagster_wandb.launch.ops import (
-    wandb_launch_single_run_op,
     wandb_launch_add_op
 )
 from dagster_wandb.resources import wandb_api_resource
@@ -12,5 +11,4 @@ from dagster_wandb.resources import wandb_api_resource
     }
 )
 def pipeline():
-   #  wandb_launch_single_run_op()
    wandb_launch_add_op()
