@@ -31,7 +31,7 @@ if __name__ == "__main__":
         packages=find_packages(exclude=["dagster_wandb_tests*"]),
         install_requires=[
             "dagster",
-            "wandb>=1.12",
+            "wandb[launch]>=0.12.18",
         ],
         zip_safe=False,
     )
