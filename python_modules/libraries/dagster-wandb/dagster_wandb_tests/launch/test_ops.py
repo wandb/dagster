@@ -3,6 +3,7 @@ import pytest
 from dagster_wandb.launch.ops import (
     wandb_launch_single_run_op,
     wandb_launch_gcp_op,
+    wandb_launch_add_op,
     # wandb_launch_aws_op,
     wandb_launch_agent_op
 )
@@ -17,12 +18,30 @@ def test_wandb_launch_local_op():
     def launch_single_run():
         wandb_launch_single_run_op.alias("single_run_op")()
     result = launch_single_run.execute_in_process(
-            run_config={"ops": {"single_run_op": {"config": {"uri": "https://github.com/stephchen/sc-pytorch-mnist"
-                                                          , "entry_point": "python train.py"
-                                                          , "entity": "wandb-data-science"
-                                                          , "project" : "launch_testing"
+            run_config={"ops": {"single_run_op": {"config": {"uri": "https://wandb.ai/ash-shaik/dagster_wandb_run/runs/3adqksme"
+                                                         # , "entry_point": ["python", "train.py"]
+                                                          , "entity": "ash-shaik"
+                                                          , "project" : "dagster-launch"
                                                           }}}
-                        ,'resources': {'wandbapi': {'config': {'api_key': 'test'}}}
+                        ,'resources': {'wandbapi': {'config': {'api_key': 'test-key'}}}
+                        }
+        )
+    assert result.success
+    #wandb_launch_op_()
+
+
+def test_wandb_launch_add_op():
+    @job(resource_defs={"wandbapi":wandb_api_resource})
+    def launch_add():
+        wandb_launch_add_op.alias("launch_add_op")()
+    result = launch_add.execute_in_process(
+            run_config={"ops": {"launch_add_op": {"config": {"uri": "https://wandb.ai/ash-shaik/dagster-launch/runs/2ra0v32q"
+                                                         # , "entry_point": ["python", "train.py"]
+                                                          , "entity": "ash-shaik"
+                                                          , "project" : "dagster-launch"
+                                                          , "queue" : ['default']
+                                                          }}}
+                        ,'resources': {'wandbapi': {'config': {'api_key': 'test-key'}}}
                         }
         )
     assert result.success
@@ -37,11 +56,11 @@ def test_wandb_launch_agent_op():
     result = launch_local_agent.execute_in_process(
         run_config={ "ops": {"launch_local_agent_op" : {"config":{
              "entity": "wandb-data-science"
-            , "project" : "launch_testing"
+            , "project" : "dagster-launch"
             , "max_jobs" : 2
         }}}
 
-            , 'resources': {'wandbapi': {'config': {'api_key': 'test'}}}
+            , 'resources': {'wandbapi': {'config': {'api_key': 'test-key'}}}
 
         })
     assert result.success

@@ -1,4 +1,5 @@
 from dagster import Bool, Field, String, Noneable
+from dagster.core.types.dagster_type import Array, Optional
 from dagster_wandb.launch.util import utils
 import json
 
@@ -13,21 +14,22 @@ def wandb_init_config():
 def wandb_launch_shared_config():
     uri = Field(
         config=str,
-        is_required=True,
+        is_required=False,
         description="URI of experiment to run. A wandb run uri or a Git repository URI",
     )
     entry_point = Field(
-        String,
+        config=Array(str),
+        is_required=False,
         description="Entry point of the run. default: main"
     )
-
     entity = Field(
         config=str,
+        is_required=False,
         description="Name of the target entity which the new run will be sent to",
     )
-
     project = Field(
         config=str,
+        is_required=False,
         description="The target project for the launched run"
     )
 
@@ -39,13 +41,29 @@ def wandb_launch_shared_config():
     }
 
 
+def wandb_launch_add_config():
+    shared_conf = wandb_launch_shared_config()
+
+    queue = Field(
+        config=Array(str),
+        is_required=False,
+        description="Run queue to push to",
+    )
+    return {
+            "uri": shared_conf.get("uri"),
+            "entry_point": shared_conf.get("entry_point", None),
+            "entity": shared_conf["entity"],
+            "project": shared_conf["project"],
+            "queue" : queue
+    }
+
+
 def wandb_launch_config():
     shared_conf = wandb_launch_shared_config
 
-    uri = Field(
-        config=str,
-        is_required=True,
-        description="URI of experiment to run. A wandb run uri or a Git repository URI",
+    queue = Field(
+        config=Array(str),
+        description="Run queue to push to",
     )
 
     entity = Field(
@@ -129,6 +147,7 @@ def wandb_launch_agent_queue_config():
 def wandb_launch_agent_config():
     entity = Field(
         String,
+        is_required=False,
         description="The target entity for the launched run. Defaults to current logged-in user"
     )
     project = Field(
@@ -143,6 +162,7 @@ def wandb_launch_agent_config():
     )
     max_jobs = Field(
         int,
+        is_required=False,
         description="The maximum number of launch jobs this agent can run in parallel. Defaults to 1.",
     )
     return {

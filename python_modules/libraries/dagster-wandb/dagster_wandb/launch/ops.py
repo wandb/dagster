@@ -1,11 +1,13 @@
 from dagster import op
 from wandb.sdk.launch import launch as wandb_launch
+from wandb.sdk.launch.launch_add import launch_add as wandb_launch_with_agent
 from wandb.sdk.launch.agent import LaunchAgent as launch_agent
 from wandb.errors import LaunchError
 
 
 from .configs import (
     wandb_launch_agent_config,
+    wandb_launch_add_config,
     wandb_compute_aws_config,
     wandb_compute_gcp_config,
     wandb_launch_shared_config
@@ -40,20 +42,21 @@ def wandb_launch_single_run_op(context):
     context.log.info("executing single_run_op %s" % (context.op_config.get("uri")))
 
     (uri, entry_point, entity, project) = [context.op_config.get(k) for k in ("uri", "entry_point", "entity", "project")]
+    print(entry_point)
     wandb_output = wandb_launch.run(api=context.resources.wandbapi
                                     , uri=uri, entry_point=entry_point
                                     , entity=entity, project=project)
-    # print(wandb_output)
-    return wandb_output
+    print(wandb_output.get_status())
+    # return wandb_output
 
 
 @op(
     **_DEFAULT_OP_PROPS,
-    config_schema=wandb_launch_shared_config(),
+    config_schema=wandb_launch_add_config(),
 )
-def wandb_launch_op(context):
+def wandb_launch_add_op(context):
     """
-    wandb Launch Local - single run
+    wandb Launch Local - Add job to queue, run by agent waiting at the queue.
     This op encapsulates a wandb launch
     Expects a single run resource to be provisioned and initiate a run.
     Args:
@@ -67,10 +70,13 @@ def wandb_launch_op(context):
     # print("In wandb_launch_single_run_op")
     context.log.info("executing single_run_op %s" % (context.op_config.get("uri")))
 
-    (uri, entry_point, entity, project) = [context.op_config.get(k) for k in ("uri", "entry_point", "entity", "project")]
-    wandb_output = wandb_launch.run(api=context.resources.wandbapi
-                                    , uri=uri, entry_point=entry_point
-                                    , entity=entity, project=project)
+    (uri, entry_point, entity, project, queue) = [context.op_config.get(k) for k in ("uri", "entry_point", "entity"
+                                                                              , "project", "queue")]
+    wandb_output = wandb_launch_with_agent(# api=context.resources.wandbapi,
+                                      uri=uri, entry_point=entry_point
+                                    , entity=entity, project=project
+                                    , resource="local-process"
+                                    , queue=None)
     # print(wandb_output)
     return wandb_output
 
@@ -98,6 +104,12 @@ def wandb_launch_agent_op(context):
         "max_jobs": max_jobs
     }
     agent = launch_agent(api=context.resources.wandbapi, config=config)
+    agent.loop()
+    print(agent._entity)
+    print(agent._project)
+    print(agent._base_url)
+    print(agent.job_ids)
+
     print(agent.print_status())
     return agent.print_status()
 

@@ -1,0 +1,7 @@
+ops:
+  wandb_launch_single_run_op:
+    config:
+      uri: 'https://github.com/moonshot-s/dagster-launch'
+      entry_point:  ["python", "launch_test.py"]
+      entity: ash-shaik
+      project: dagster-launch

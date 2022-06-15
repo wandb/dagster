@@ -110,9 +110,11 @@ docs/_build
 python_modules/dagster/docs/_build
 .vscode/
 
+
 dagit_run_logs
 
 python_modules/libraries/dagster-aws/dagster_aws/ecs/config.yaml
+# python_modules/libraries/dagster-wandb/temp/*.yaml
 
 python_modules/dagit/node_modules/
 python_modules/dagit/yarn.lock
