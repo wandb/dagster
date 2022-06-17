@@ -3,5 +3,5 @@ ops:
     config:
       uri: 'https://github.com/moonshot-s/dagster-launch'
       entry_point:  ["python", "launch_test.py"]
-      entity: ash-shaik
-      project: dagster-launch
+      entity: wandb-data-science
+      project: dagster_test

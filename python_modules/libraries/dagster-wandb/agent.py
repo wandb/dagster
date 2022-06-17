@@ -6,7 +6,7 @@ from dagster_wandb.resources import wandb_api_resource
 
 @job(
     resource_defs={
-        "wandbapi": wandb_api_resource.configured({"api_key": "test-key"}),
+        "wandbapi": wandb_api_resource.configured({"api_key": "e1c1d4d30a50023c3cceaa285bf7e16e43c93760"}),
     }
 )
 def pipeline():

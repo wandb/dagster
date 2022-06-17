@@ -45,16 +45,24 @@ def wandb_launch_add_config():
     shared_conf = wandb_launch_shared_config()
 
     queue = Field(
-        config=Array(str),
+        config=str,
         is_required=False,
         description="Run queue to push to",
+    )
+
+    resource = Field(
+        config=str,
+        is_required=False,
+        default_value="local-process",
+        description="resource cluster where jobs run"
     )
     return {
             "uri": shared_conf.get("uri"),
             "entry_point": shared_conf.get("entry_point", None),
             "entity": shared_conf["entity"],
             "project": shared_conf["project"],
-            "queue" : queue
+            "queue" : queue,
+            "resource" : resource
     }
 
 

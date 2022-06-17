@@ -1,0 +1,21 @@
+{
+    "os": "macOS-12.3.1-x86_64-i386-64bit",
+    "python": "3.9.13",
+    "heartbeatAt": "2022-06-16T02:40:42.925363",
+    "startedAt": "2022-06-16T02:40:41.551799",
+    "docker": null,
+    "cpu_count": 16,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/Users/ashrafshaik/.pyenv/versions/dagster39/bin/pytest",
+    "git": {
+        "remote": "git@github.com:wandb/dagster.git",
+        "commit": "15f5b45fe8435dc418edb8140fb7ff5980fda670"
+    },
+    "email": "ashraf.shaik@wandb.com",
+    "root": "/Users/ashrafshaik/dagster",
+    "host": "Ashrafs-MBP.hsd1.ca.comcast.net",
+    "username": "ashrafshaik",
+    "executable": "/Users/ashrafshaik/.pyenv/versions/3.9.13/envs/dagster39/bin/python3.9"
+}

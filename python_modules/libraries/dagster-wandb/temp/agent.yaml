@@ -3,6 +3,6 @@ ops:
     config:
       # uri: 'https://wandb.ai/ash-shaik/dagster-launch/runs/2ra0v32q' #'https://github.com/moonshot-s/dagster-launch'
       # entry_point:  ["python", "launch_test.py"]
-      entity: ash-shaik
-      project: dagster-launch
+      entity: wandb-data-science
+      project: dagster_test
       # queue: None

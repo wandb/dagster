@@ -70,13 +70,13 @@ def wandb_launch_add_op(context):
     # print("In wandb_launch_single_run_op")
     context.log.info("executing single_run_op %s" % (context.op_config.get("uri")))
 
-    (uri, entry_point, entity, project, queue) = [context.op_config.get(k) for k in ("uri", "entry_point", "entity"
-                                                                              , "project", "queue")]
+    (uri, entry_point, entity, project, queue, resource) = [context.op_config.get(k) for k in ("uri", "entry_point", "entity"
+                                                                              , "project", "queue", "resource")]
     wandb_output = wandb_launch_with_agent(# api=context.resources.wandbapi,
                                       uri=uri, entry_point=entry_point
                                     , entity=entity, project=project
-                                    , resource="local-process"
-                                    , queue=None)
+                                    , resource=resource
+                                    , queue=queue)
     # print(wandb_output)
     return wandb_output
 
